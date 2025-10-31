@@ -129,7 +129,7 @@
         "tags": [
           "AccountPin"
         ],
-        "summary": "Reuqest to create the account pin.",
+        "summary": "Request to create the account pin.",
         "consumes": [
           "application/json",
           "text/json"
@@ -197,125 +197,99 @@
         }
       }
     },
-    "/v1/credentials/verification": {
+    "/v1/client-assertion": {
       "get": {
         "tags": [
-          "Credentials"
+          "AuthenticationTicket"
         ],
-        "summary": "Checks if it is possible to send a verification message for the provided credentials.",
+        "summary": "Creates a client assertion to be used when generating an auth ticket.",
         "produces": [
           "application/json",
           "text/json"
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "CredentialType",
-            "description": "Credentials type Roblox.Platform.Authentication.CredentialsType.",
-            "required": true,
-            "type": "integer",
-            "format": "int32",
-            "enum": [
-              0,
-              1,
-              2,
-              3,
-              4
-            ]
-          },
-          {
-            "in": "query",
-            "name": "CredentialValue",
-            "description": "Credentials value.",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "in": "query",
-            "name": "Password",
-            "description": "Credentials password.",
-            "required": true,
-            "type": "string"
-          }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/Roblox.Authentication.Api.Models.CanSendCredentialsVerificationMessageResponse"
+              "$ref": "#/definitions/Roblox.Authentication.Api.Models.Response.GetClientAssertionResponse"
             }
           },
-          "400": {
-            "description": "0: An unexpected error occurred.\r\n1: Credential value and password are required. Please try again."
-          },
-          "404": {
-            "description": "5: Credentials verification operation is unavailable. Please try again later."
-          },
-          "429": {
-            "description": "2: Too many attempts. Please wait a bit."
-          },
-          "503": {
-            "description": "5: Credentials verification operation is unavailable. Please try again later."
+          "401": {
+            "description": "0: Authorization has been denied for this request."
           }
         },
         "properties": {
           "internal": false,
           "metricIds": [
-            "Credentials:CanSendCredentialsVerificationMessageFromUri"
+            "AuthenticationTicket:GetClientAssertion"
           ]
         }
-      },
-      "post": {
+      }
+    },
+    "/v1/external/{identityProviderId}/sso/oauth/callback": {
+      "get": {
         "tags": [
-          "Credentials"
+          "ExternalIdentitiesGateway"
         ],
-        "summary": "Checks if it is possible to send a verification message for the provided credentials.",
-        "consumes": [
-          "application/json",
-          "text/json"
-        ],
-        "produces": [
-          "application/json",
-          "text/json"
-        ],
+        "summary": "Callback function that external identity provider calls post user authentication.",
         "parameters": [
           {
-            "in": "body",
-            "name": "request",
-            "description": "Request model with a credential value, type, and password.",
+            "in": "path",
+            "name": "identityProviderId",
             "required": true,
-            "schema": {
-              "$ref": "#/definitions/Roblox.Authentication.Api.Models.SendCredentialsVerificationMessageRequest"
-            }
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "code",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "state",
+            "required": true,
+            "type": "string"
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/Roblox.Authentication.Api.Models.CanSendCredentialsVerificationMessageResponse"
-            }
-          },
-          "400": {
-            "description": "0: An unexpected error occurred.\r\n1: Credential value and password are required. Please try again."
-          },
-          "403": {
-            "description": "0: Token Validation Failed"
-          },
-          "404": {
-            "description": "5: Credentials verification operation is unavailable. Please try again later."
-          },
-          "429": {
-            "description": "2: Too many attempts. Please wait a bit."
-          },
-          "503": {
-            "description": "5: Credentials verification operation is unavailable. Please try again later."
+          "302": {
+            "description": "Redirect"
           }
         },
         "properties": {
           "internal": false,
           "metricIds": [
-            "Credentials:CanSendCredentialsVerificationMessageFromBody"
+            "ExternalIdentitiesGateway:OAuthCallback"
+          ]
+        }
+      }
+    },
+    "/v1/external/{identityProviderId}/sso/oauth/init": {
+      "get": {
+        "tags": [
+          "ExternalIdentitiesGateway"
+        ],
+        "summary": "Signs a user up for Roblox and links the account to the authenticated external provider ID.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "identityProviderId",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Redirect"
+          }
+        },
+        "properties": {
+          "internal": false,
+          "metricIds": [
+            "ExternalIdentitiesGateway:OAuthInit"
           ]
         }
       }
@@ -834,6 +808,88 @@
         }
       }
     },
+    "/v1/validators/recommendedUsernameFromDisplayName": {
+      "get": {
+        "tags": [
+          "Validators"
+        ],
+        "summary": "Validates the given display name, and if valid, will convert it to a valid username and return suggested username(s) if available.",
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "DisplayName",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "BirthDay",
+            "required": true,
+            "type": "string",
+            "format": "date-time"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Roblox.Authentication.Api.Models.RecommendedUsernameResponse"
+            }
+          }
+        },
+        "properties": {
+          "internal": false,
+          "metricIds": [
+            "Validators:GetRecommendedUsernameFromDisplayName"
+          ]
+        }
+      },
+      "post": {
+        "tags": [
+          "Validators"
+        ],
+        "summary": "Validates the given display name, and if valid, will convert it to a valid username and return suggested username(s) if available.\r\n            \r\nThis is a POST request and explicitly does not receive the parameter values from the query",
+        "consumes": [
+          "application/json",
+          "text/json"
+        ],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "requestBody",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Roblox.Authentication.Api.Models.RecommendedUsernameFromDisplayNameRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Roblox.Authentication.Api.Models.RecommendedUsernameResponse"
+            }
+          },
+          "403": {
+            "description": "0: Token Validation Failed"
+          }
+        },
+        "properties": {
+          "internal": false,
+          "metricIds": [
+            "Validators:PostRecommendedUsernameFromDisplayName"
+          ]
+        }
+      }
+    },
     "/v1/validators/username": {
       "get": {
         "tags": [
@@ -962,7 +1018,7 @@
         "tags": [
           "Xbox"
         ],
-        "summary": "Check if the current user has an Xbox connected.",
+        "summary": "Check if the current user has an Xbox connected.\r\nAlso returns the gamertag of the Xbox account if connected.",
         "produces": [
           "application/json",
           "text/json"
@@ -1056,7 +1112,46 @@
         }
       }
     },
-    "/external/login": {
+    "/v1/external/access": {
+      "post": {
+        "tags": [
+          "ExternalIdentitiesGateway"
+        ],
+        "summary": "Signs a user up for Roblox and links the account to the authenticated external provider ID.",
+        "consumes": [
+          "application/json",
+          "text/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Roblox.Authentication.Api.Models.Request.ExternalAccessRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Roblox.Authentication.Api.Models.Response.ExternalIdentityGateway.ExternalIdentityAccessResponse"
+            }
+          }
+        },
+        "properties": {
+          "internal": false,
+          "metricIds": [
+            "ExternalIdentitiesGateway:Access"
+          ]
+        }
+      }
+    },
+    "/v1/external/login": {
       "post": {
         "tags": [
           "ExternalIdentitiesGateway"
@@ -1078,7 +1173,7 @@
         }
       }
     },
-    "/external/loginAndLink": {
+    "/v1/external/loginAndLink": {
       "post": {
         "tags": [
           "ExternalIdentitiesGateway"
@@ -1100,7 +1195,7 @@
         }
       }
     },
-    "/external/signup": {
+    "/v1/external/signup": {
       "post": {
         "tags": [
           "ExternalIdentitiesGateway"
@@ -1122,7 +1217,7 @@
         }
       }
     },
-    "/external/unlink": {
+    "/v1/external/unlink": {
       "post": {
         "tags": [
           "ExternalIdentitiesGateway"
@@ -1427,6 +1522,58 @@
         }
       }
     },
+    "/v1/identity/initialize-login": {
+      "post": {
+        "tags": [
+          "Identifier"
+        ],
+        "summary": "Initiates identifier-first login flow by returning a list of login methods for user(s).",
+        "consumes": [
+          "application/json",
+          "text/json"
+        ],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "initializeLoginRequest",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Roblox.Authentication.Api.Models.Request.InitializeLoginRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Roblox.Authentication.Api.Models.Response.InitializeLoginResponse"
+            }
+          },
+          "400": {
+            "description": "3: User identifier and type are required."
+          },
+          "403": {
+            "description": "0: Token Validation Failed\r\n2: Invalid user identifier."
+          },
+          "500": {
+            "description": "0: An unknown error occurred."
+          },
+          "503": {
+            "description": "1: This feature is disabled."
+          }
+        },
+        "properties": {
+          "internal": false,
+          "metricIds": [
+            "Identifier:InitializeLogin"
+          ]
+        }
+      }
+    },
     "/v1/login": {
       "post": {
         "tags": [
@@ -1463,7 +1610,7 @@
             "description": "0: An unexpected error occurred.\r\n3: Username and Password are required. Please try again.\r\n8: Login with received credential type is not supported."
           },
           "403": {
-            "description": "0: Token Validation Failed\r\n1: Incorrect username or password. Please try again.\r\n2: You must pass the robot test before logging in.\r\n4: Account has been locked. Please request a password reset.\r\n5: Unable to login. Please use Social Network sign on.\r\n6: Account issue. Please contact Support.\r\n9: Unable to login with provided credentials. Default login is required.\r\n10: Received credentials are unverified.\r\n12: Existing login session found. Please log out first.\r\n14: The account is unable to log in. Please log in to the LuoBu app.\r\n15: Too many attempts. Please wait a bit."
+            "description": "0: Token Validation Failed\r\n1: Incorrect username or password. Please try again.\r\n2: You must pass the robot test before logging in.\r\n4: Account has been locked. Please request a password reset.\r\n5: Unable to login. Please use Social Network sign on.\r\n6: Account issue. Please contact Support.\r\n9: Unable to login with provided credentials. Default login is required.\r\n10: Received credentials are unverified.\r\n12: Existing login session found. Please log out first.\r\n14: The account is unable to log in. Please log in to the LuoBu app.\r\n15: Too many attempts. Please wait a bit.\r\n27: The account is unable to login. Please log in with the VNG app."
           },
           "429": {
             "description": "7: Too many attempts. Please wait a bit."
@@ -1476,6 +1623,59 @@
           "internal": false,
           "metricIds": [
             "Authentication:Login"
+          ]
+        }
+      }
+    },
+    "/v1/login/linked": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Endpoint for logging in a user, specifically for linked\r\nauthentication on PCGDK",
+        "consumes": [
+          "application/json",
+          "text/json"
+        ],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "request",
+            "description": "Roblox.Authentication.Api.Models.LoginRequest",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Roblox.Authentication.Api.Models.LoginRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Roblox.Authentication.Api.Models.LoginResponse"
+            }
+          },
+          "400": {
+            "description": "0: An unexpected error occurred.\r\n3: Username and Password are required. Please try again.\r\n8: Login with received credential type is not supported."
+          },
+          "403": {
+            "description": "0: Token Validation Failed\r\n1: Incorrect username or password. Please try again.\r\n2: You must pass the robot test before logging in.\r\n4: Account has been locked. Please request a password reset.\r\n5: Unable to login. Please use Social Network sign on.\r\n6: Account issue. Please contact Support.\r\n9: Unable to login with provided credentials. Default login is required.\r\n10: Received credentials are unverified.\r\n12: Existing login session found. Please log out first.\r\n14: The account is unable to log in. Please log in to the LuoBu app.\r\n15: Too many attempts. Please wait a bit.\r\n27: The account is unable to login. Please log in with the VNG app."
+          },
+          "429": {
+            "description": "7: Too many attempts. Please wait a bit."
+          },
+          "503": {
+            "description": "11: Service unavailable. Please try again."
+          }
+        },
+        "properties": {
+          "internal": false,
+          "metricIds": [
+            "Authentication:LinkedLogin"
           ]
         }
       }
@@ -1518,9 +1718,23 @@
           "Authentication"
         ],
         "summary": "Logs out user from all other sessions.",
+        "consumes": [
+          "application/json",
+          "text/json"
+        ],
         "produces": [
           "application/json",
           "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Roblox.Authentication.Api.Models.Request.LogoutFromAllSessionsAndReauthenticateRequest"
+            }
+          }
         ],
         "responses": {
           "200": {
@@ -1540,6 +1754,453 @@
           "internal": false,
           "metricIds": [
             "Authentication:LogoutFromAllSessionsAndReauthenticate"
+          ]
+        }
+      }
+    },
+    "/v1/passkey/DeleteCredentialBatch": {
+      "post": {
+        "tags": [
+          "Passkeys"
+        ],
+        "summary": "Disables a batch of credentials for the specified user.",
+        "consumes": [
+          "application/json",
+          "text/json"
+        ],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "request",
+            "description": "The request body!:DisableTwoStepVerificationRequest.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Roblox.Authentication.Api.Models.Request.DeletePasskeysRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Roblox.Web.WebAPI.ApiEmptyResponseModel"
+            }
+          },
+          "401": {
+            "description": "0: Authorization has been denied for this request.\r\n0: An unknown error occurred with the request."
+          },
+          "403": {
+            "description": "0: Token Validation Failed"
+          },
+          "503": {
+            "description": "2: Feature disabled."
+          }
+        },
+        "properties": {
+          "internal": false,
+          "metricIds": [
+            "Passkeys:DeletePasskeys"
+          ]
+        }
+      }
+    },
+    "/v1/passkey/finish-preauth-registration": {
+      "post": {
+        "tags": [
+          "Passkeys"
+        ],
+        "consumes": [
+          "application/json",
+          "text/json"
+        ],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Roblox.Authentication.Api.Models.Request.FinishPasskeyPreauthRegistrationRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Roblox.Web.WebAPI.ApiEmptyResponseModel"
+            }
+          },
+          "400": {
+            "description": "0: An unknown error occurred with the request."
+          },
+          "401": {
+            "description": "0: Authorization has been denied for this request.\r\n0: An unknown error occurred with the request."
+          },
+          "403": {
+            "description": "0: Token Validation Failed\r\n1: Reached limit of pass keys registered."
+          },
+          "500": {
+            "description": "0: An unknown error occurred with the request."
+          },
+          "503": {
+            "description": "2: Feature disabled."
+          }
+        },
+        "properties": {
+          "internal": false,
+          "metricIds": [
+            "Passkeys:FinishPreauthRegistration"
+          ]
+        }
+      }
+    },
+    "/v1/passkey/FinishRegistration": {
+      "post": {
+        "tags": [
+          "Passkeys"
+        ],
+        "summary": "Complete Passkey registration by providing credential creation options.",
+        "consumes": [
+          "application/json",
+          "text/json"
+        ],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "request",
+            "description": "The request body.Roblox.Authentication.Api.Models.Request.FinishPasskeyRegistrationRequest.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Roblox.Authentication.Api.Models.Request.FinishPasskeyRegistrationRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Roblox.Web.WebAPI.ApiEmptyResponseModel"
+            }
+          },
+          "400": {
+            "description": "0: An unknown error occurred with the request.\r\n3: Invalid security key nickname."
+          },
+          "401": {
+            "description": "0: Authorization has been denied for this request.\r\n0: An unknown error occurred with the request."
+          },
+          "403": {
+            "description": "0: Token Validation Failed\r\n3: Invalid security key nickname."
+          },
+          "503": {
+            "description": "2: Feature disabled."
+          }
+        },
+        "properties": {
+          "internal": false,
+          "metricIds": [
+            "Passkeys:FinishRegistration"
+          ]
+        }
+      }
+    },
+    "/v1/passkey/ListCredentials": {
+      "post": {
+        "tags": [
+          "Passkeys"
+        ],
+        "summary": "List a user's registered passkeys.",
+        "consumes": [
+          "application/json",
+          "text/json"
+        ],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Roblox.Authentication.Api.Models.Request.ListPasskeysRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Roblox.Authentication.Api.Models.Response.ListPasskeyCredentialResponse"
+            }
+          },
+          "401": {
+            "description": "0: Authorization has been denied for this request.\r\n0: An unknown error occurred with the request."
+          },
+          "403": {
+            "description": "0: Token Validation Failed"
+          },
+          "503": {
+            "description": "2: Feature disabled."
+          }
+        },
+        "properties": {
+          "internal": false,
+          "metricIds": [
+            "Passkeys:ListPassKey"
+          ]
+        }
+      }
+    },
+    "/v1/passkey/start-authentication-by-user": {
+      "post": {
+        "tags": [
+          "Passkeys"
+        ],
+        "summary": "Initializes passkey authentication for the user(s) corresponding to the identifier provided.",
+        "consumes": [
+          "application/json",
+          "text/json"
+        ],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Roblox.Authentication.Api.Models.Request.StartAuthenticationByUserRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Roblox.Authentication.Api.Models.Response.StartAuthenticationByUserResponse"
+            }
+          },
+          "400": {
+            "description": "5: User identifier and type are required.\r\n6: Multi-user passkey authentication is not supported for this credential type."
+          },
+          "403": {
+            "description": "0: Token Validation Failed\r\n4: No passkeys registered for any users found."
+          },
+          "503": {
+            "description": "2: Feature disabled."
+          }
+        },
+        "properties": {
+          "internal": false,
+          "metricIds": [
+            "Passkeys:StartAuthenticationByUser"
+          ]
+        }
+      }
+    },
+    "/v1/passkey/start-preauth-registration": {
+      "post": {
+        "tags": [
+          "Passkeys"
+        ],
+        "summary": "Initiates  Passkey preauthenticated registration by providing credential creation options.",
+        "consumes": [
+          "application/json",
+          "text/json"
+        ],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Roblox.Authentication.Api.Models.Request.StartPasskeyPreauthRegistrationRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Roblox.Authentication.Api.Models.Response.StartPasskeyPreauthRegistrationResponse"
+            }
+          },
+          "403": {
+            "description": "0: Token Validation Failed"
+          },
+          "503": {
+            "description": "2: Feature disabled."
+          }
+        },
+        "properties": {
+          "internal": false,
+          "metricIds": [
+            "Passkeys:StartPreauthRegistration"
+          ]
+        }
+      }
+    },
+    "/v1/passkey/StartAuthentication": {
+      "post": {
+        "tags": [
+          "Passkeys"
+        ],
+        "summary": "Provides a challenge for the Passkey to authenticate.",
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Roblox.Authentication.Api.Models.Response.StartAuthenticationResponse"
+            }
+          },
+          "403": {
+            "description": "0: Token Validation Failed"
+          },
+          "503": {
+            "description": "2: Feature disabled."
+          }
+        },
+        "properties": {
+          "internal": false,
+          "metricIds": [
+            "Passkeys:StartAuthentication"
+          ]
+        }
+      }
+    },
+    "/v1/passkey/StartRegistration": {
+      "post": {
+        "tags": [
+          "Passkeys"
+        ],
+        "summary": "Initiates Passkey registration by providing credential creation options.",
+        "consumes": [
+          "application/json",
+          "text/json"
+        ],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "flow",
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Roblox.Authentication.Api.Models.Request.StartPasskeyRegistrationRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Roblox.Authentication.Api.Models.Response.StartPasskeyRegistrationResponse"
+            }
+          },
+          "401": {
+            "description": "0: Authorization has been denied for this request.\r\n0: An unknown error occurred with the request."
+          },
+          "403": {
+            "description": "0: Token Validation Failed\r\n1: Reached limit of pass keys registered."
+          },
+          "503": {
+            "description": "2: Feature disabled."
+          }
+        },
+        "properties": {
+          "internal": false,
+          "metricIds": [
+            "Passkeys:StartRegistration"
+          ]
+        }
+      }
+    },
+    "/v1/session/refresh": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Logs out user from the current session and create a new one.",
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Roblox.Web.WebAPI.ApiEmptyResponseModel"
+            }
+          },
+          "403": {
+            "description": "0: Token Validation Failed"
+          }
+        },
+        "properties": {
+          "internal": false,
+          "metricIds": [
+            "Authentication:SessionRefresh"
+          ]
+        }
+      }
+    },
+    "/v1/palisades-live/is-live": {
+      "get": {
+        "tags": [
+          "PSLive"
+        ],
+        "summary": "",
+        "produces": [
+          "text/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Roblox.Authentication.Api.Models.PlaystationIsLiveResponse"
+            }
+          },
+          "401": {
+            "description": "0: Authorization has been denied for this request."
+          },
+          "403": {
+            "description": "0: Token Validation Failed"
+          }
+        },
+        "properties": {
+          "internal": true,
+          "metricIds": [
+            "PSLive:IsLive"
           ]
         }
       }
@@ -1997,16 +2658,16 @@
             }
           },
           "400": {
-            "description": "Bad request\r\n16: User agreement ids are null."
+            "description": "Bad request\r\n16: User agreement ids are null.\r\n21: Empty account switch blob required"
           },
           "500": {
-            "description": "Internal server error\r\n15: Insert acceptances failed."
+            "description": "Internal server error\r\n15: Insert acceptances failed.\r\n27: Pre-auth passkey registration failed"
           },
           "503": {
             "description": "Service unavailable"
-          },
+            },
           "403": {
-            "description": "0: Token Validation Failed\r\n2: Captcha Failed.\r\n4: Invalid Birthday.\r\n5: Invalid Username.\r\n6: Username already taken.\r\n7: Invalid Password.\r\n8: Password and Username are same.\r\n9: Password is too simple.\r\n10: Email is invalid.\r\n11: Asset is invalid.\r\n12: Too many attempts. Please wait a bit.\r\n17: One time Passcode session was not valid"
+            "description": "0: Token Validation Failed\r\n2: Captcha Failed.\r\n4: Invalid Birthday.\r\n5: Invalid Username.\r\n6: Username already taken.\r\n7: Invalid Password.\r\n8: Password and Username are same.\r\n9: Password is too simple.\r\n10: Email is invalid.\r\n11: Asset is invalid.\r\n12: Too many attempts. Please wait a bit.\r\n17: One time Passcode session was not valid\r\n22: Maximum logged in accounts limit reached."
           },
           "429": {
             "description": "3: Too many attempts. Please wait a bit."
@@ -2016,6 +2677,59 @@
           "internal": false,
           "metricIds": [
             "Signup:Signup"
+          ]
+        }
+      }
+    },
+    "/v1/signup/linked": {
+      "post": {
+        "tags": [
+          "Signup"
+        ],
+        "summary": "Endpoint for signing up a new user, specifically for linked\r\nauthentication on PCGDK",
+        "consumes": [
+          "application/json",
+          "text/json"
+        ],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "request",
+            "description": "Roblox.Authentication.Api.Models.SignupRequest",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Roblox.Authentication.Api.Models.SignupRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Roblox.Authentication.Api.Models.SignupResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request\r\n16: User agreement ids are null.\r\n21: Empty account switch blob required"
+          },
+          "500": {
+            "description": "Internal server error\r\n15: Insert acceptances failed.\r\n27: Pre-auth passkey registration failed"
+          },
+          "403": {
+            "description": "0: Token Validation Failed\r\n2: Captcha Failed.\r\n4: Invalid Birthday.\r\n5: Invalid Username.\r\n6: Username already taken.\r\n7: Invalid Password.\r\n8: Password and Username are same.\r\n9: Password is too simple.\r\n10: Email is invalid.\r\n11: Asset is invalid.\r\n12: Too many attempts. Please wait a bit.\r\n17: One time Passcode session was not valid\r\n22: Maximum logged in accounts limit reached."
+          },
+          "429": {
+            "description": "3: Too many attempts. Please wait a bit."
+          }
+        },
+        "properties": {
+          "internal": false,
+          "metricIds": [
+            "Signup:LinkedSignup"
           ]
         }
       }
@@ -2852,11 +3566,11 @@
               "$ref": "#/definitions/Roblox.Authentication.Api.Models.XboxCollectionsOfUserResponse"
             }
           },
-          "403": {
-            "description": "\r\n0: Token Validation Failed"
-          },
           "401": {
             "description": "0: Authorization has been denied for this request."
+          },
+          "403": {
+            "description": "\r\n0: Token Validation Failed"
           }
         },
         "properties": {
@@ -3117,6 +3831,29 @@
     }
   },
   "definitions": {
+    "Roblox.Authentication.Api.Models.AccountLinkParameters": {
+      "type": "object",
+      "properties": {
+        "LinkingPlatform": {
+          "format": "int32",
+          "description": " ['Invalid' = 0, 'Xbox' = 1, 'Qq' = 2, 'WeChat' = 3, 'Facebook' = 4, 'RobloxDeveloper' = 5, 'RobloxGroupCreator' = 6, 'Playstation' = 7, 'ExternalProvider' = 8, 'Example' = 999]",
+          "enum": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            999
+          ],
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false
+    },
     "Roblox.Authentication.Api.Models.AccountPinRequest": {
       "description": "A request model to accept pin.",
       "type": "object",
@@ -3129,7 +3866,8 @@
           "description": "A re-authentication token redeemable for any password check.",
           "type": "string"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "Roblox.Authentication.Api.Models.AccountPinResponse": {
       "description": "A response model for unlocking account pin",
@@ -3140,7 +3878,8 @@
           "description": "Returns the number of seconds left the account pin is unlocked until.",
           "type": "number"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "Roblox.Authentication.Api.Models.AccountPinStatusResponse": {
       "description": "A class representing the status of Account Pin.",
@@ -3155,7 +3894,8 @@
           "description": "Returns the number of seconds left the account pin is unlocked until.",
           "type": "number"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "Roblox.Authentication.Api.Models.AuthMetaDataResponse": {
       "description": "The response model containing metadata for auth.",
@@ -3166,7 +3906,8 @@
           "description": "Timeout for cookie law notice banner.",
           "type": "integer"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "Roblox.Authentication.Api.Models.CanSendCredentialsVerificationMessageResponse": {
       "description": "The response model containing whether a verification message can be sent to the provided credentials.",
@@ -3186,7 +3927,28 @@
           "description": "Gets or sets a value indicating whether an email is valid",
           "type": "boolean"
         }
-      }
+      },
+      "additionalProperties": false
+    },
+    "Roblox.Authentication.Api.Models.LoginMethodModel": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "format": "int32",
+          "description": " ['EmailOtp' = 0, 'Passkey' = 1, 'Password' = 2]",
+          "enum": [
+            0,
+            1,
+            2
+          ],
+          "type": "integer"
+        },
+        "priority": {
+          "format": "int32",
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false
     },
     "Roblox.Authentication.Api.Models.LoginRequest": {
       "description": "Model for login requests",
@@ -3194,13 +3956,18 @@
       "properties": {
         "ctype": {
           "format": "int32",
-          "description": "Credentials type Roblox.Platform.Authentication.CredentialsType. ['Email' = 0, 'Username' = 1, 'PhoneNumber' = 2, 'EmailOtpSessionToken' = 3, 'AuthToken' = 4]",
+          "description": " ['Email' = 0, 'Username' = 1, 'PhoneNumber' = 2, 'EmailOtpSessionToken' = 3, 'AuthToken' = 4, 'Passkey' = 5, 'AsUser' = 6, 'TwoStepVerification' = 7, 'XboxLive' = 8, 'PlatformLive' = 9]",
           "enum": [
             0,
             1,
             2,
             3,
-            4
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
           ],
           "type": "integer"
         },
@@ -3232,6 +3999,9 @@
           "description": "Metadata associated with the current session.",
           "type": "string"
         },
+        "accountLinkParameters": {
+          "$ref": "#/definitions/Roblox.Authentication.Api.Models.AccountLinkParameters"
+        },
         "captchaId": {
           "type": "string"
         },
@@ -3244,7 +4014,8 @@
         "challengeId": {
           "type": "string"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "Roblox.Authentication.Api.Models.LoginResponse": {
       "description": "A success response from a login request",
@@ -3267,6 +4038,15 @@
         "accountBlob": {
           "description": "Metadata associated with the current session",
           "type": "string"
+        },
+        "shouldUpdateEmail": {
+          "type": "boolean"
+        },
+        "recoveryEmail": {
+          "type": "string"
+        },
+        "passkeyRegistrationSucceeded": {
+          "type": "boolean"
         }
       }
     },
@@ -3304,7 +4084,8 @@
           "description": "The reason message if the request failed",
           "type": "string"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "Roblox.Authentication.Api.Models.MetadataResponse": {
       "description": "The metadata response",
@@ -3334,6 +4115,15 @@
           "description": "If the contact method is required at signup",
           "type": "boolean"
         },
+        "IsPasskeyFeatureEnabled": {
+          "type": "boolean"
+        },
+        "IsAltBrowserTracker": {
+          "type": "boolean"
+        },
+        "IsLoginRedirectPageEnabled": {
+          "type": "boolean"
+        },
         "IsUserAgreementsSignupIntegrationEnabled": {
           "description": "Whether the user agreements signup integration setting is enabled",
           "type": "boolean"
@@ -3346,7 +4136,8 @@
           "description": "Whether password entry is required for username changes.",
           "type": "boolean"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "Roblox.Authentication.Api.Models.PasswordChangeModel": {
       "type": "object",
@@ -3356,8 +4147,12 @@
         },
         "newPassword": {
           "type": "string"
+        },
+        "secureAuthenticationIntent": {
+          "$ref": "#/definitions/Roblox.Authentication.Api.Models.Request.SecureAuthenticationIntentModel"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "Roblox.Authentication.Api.Models.PasswordValidationModel": {
       "type": "object",
@@ -3370,7 +4165,8 @@
           "description": "The password.",
           "type": "string"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "Roblox.Authentication.Api.Models.PasswordValidationResponse": {
       "description": "A result representing the information about if password is valid or not.",
@@ -3378,7 +4174,7 @@
       "properties": {
         "code": {
           "format": "int32",
-          "description": "The Roblox.Authentication.Api.Models.PasswordValidationStatus of the password validation ['ValidPassword' = 0, 'WeakPasswordError' = 1, 'ShortPasswordError' = 2, 'PasswordSameAsUsernameError' = 3, 'ForbiddenPasswordError' = 4, 'DumbStringsError' = 5]",
+          "description": " ['ValidPassword' = 0, 'WeakPasswordError' = 1, 'ShortPasswordError' = 2, 'PasswordSameAsUsernameError' = 3, 'ForbiddenPasswordError' = 4, 'DumbStringsError' = 5]",
           "enum": [
             0,
             1,
@@ -3393,7 +4189,8 @@
           "description": "The response message of the password validation.",
           "type": "string"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "Roblox.Authentication.Api.Models.PlaystationConnectRequest": {
       "description": "Model for Playstation Connect requests",
@@ -3420,6 +4217,10 @@
           "type": "string"
         }
       }
+    },
+    "Roblox.Authentication.Api.Models.PlaystationIsLiveResponse": {
+      "type": "boolean",
+      "additionalProperties": false
     },
     "Roblox.Authentication.Api.Models.PlaystationSignupRequest": {
       "description": "Model for Playstation Signup requests",
@@ -3456,7 +4257,8 @@
           "description": "The social User ID.",
           "type": "string"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "Roblox.Authentication.Api.Models.QQTokenAuthenticationRequest": {
       "type": "object",
@@ -3480,6 +4282,32 @@
         }
       }
     },
+    "Roblox.Authentication.Api.Models.RecommendedUsernameFromDisplayNameRequest": {
+      "type": "object",
+      "properties": {
+        "displayName": {
+          "type": "string"
+        },
+        "birthday": {
+          "format": "date-time",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Roblox.Authentication.Api.Models.RecommendedUsernameRequest": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "birthday": {
+          "format": "date-time",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
     "Roblox.Authentication.Api.Models.RecommendedUsernameResponse": {
       "description": "A class representing the status of a Recommended Username",
       "type": "object",
@@ -3495,7 +4323,8 @@
             "type": "string"
           }
         }
-      }
+      },
+      "additionalProperties": false
     },
     "Roblox.Authentication.Api.Models.RecoverUsernameRequest": {
       "description": "Request object for recover username",
@@ -3503,10 +4332,11 @@
       "properties": {
         "targetType": {
           "format": "int32",
-          "description": "The Roblox.Authentication.Api.Models.RecoverUsernameRequest.TargetType method to recover username ['Email' = 0, 'PhoneNumber' = 1]",
+          "description": " ['Email' = 0, 'PhoneNumber' = 1, 'RecoverySessionID' = 2]",
           "enum": [
             0,
-            1
+            1,
+            2
           ],
           "type": "integer"
         },
@@ -3514,7 +4344,8 @@
           "description": "The target used to recover username",
           "type": "string"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "Roblox.Authentication.Api.Models.RecoverUsernameResponse": {
       "description": "The response model for username recovery",
@@ -3529,7 +4360,8 @@
           ],
           "type": "integer"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "Roblox.Authentication.Api.Models.RecoveryMetadataResponse": {
       "description": "Forgot Metadata Response",
@@ -3555,6 +4387,9 @@
         "isBedev2CaptchaEnabledForPasswordReset": {
           "description": "Is bedev2 captcha enabled for password reset",
           "type": "boolean"
+        },
+        "isUsernameRecoveryDeprecated": {
+          "type": "boolean"
         }
       }
     },
@@ -3570,7 +4405,8 @@
           "description": "Whether to retain any session cookies passed with the request (once automatic invalidation is enabled).",
           "type": "boolean"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "Roblox.Authentication.Api.Models.ReferralDataModel": {
       "description": "Model for Referral Data",
@@ -3621,19 +4457,170 @@
           "description": "Offer Id",
           "type": "string"
         }
-      }
+      },
+      "additionalProperties": false
+    },
+    "Roblox.Authentication.Api.Models.Request.DeletePasskeysRequest": {
+      "type": "object",
+      "properties": {
+        "credentialNicknames": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "Roblox.Authentication.Api.Models.Request.ExternalAccessRequest": {
+      "type": "object",
+      "properties": {
+        "authenticationProof": {
+          "type": "string"
+        },
+        "identityProviderPlatformType": {
+          "format": "int32",
+          "description": " ['Undefined' = 0, 'Xbox' = 1, 'Playstation' = 2, 'Web' = 3]",
+          "enum": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "type": "integer"
+        },
+        "additionalInfoPayload": {
+          "type": "object",
+          "additionalProperties": { }
+        }
+      },
+      "additionalProperties": false
+    },
+    "Roblox.Authentication.Api.Models.Request.ExternalLoginAndLinkRequest": {
+      "type": "object",
+      "properties": {
+        "ctype": {
+          "format": "int32",
+          "description": " ['Email' = 0, 'Username' = 1, 'PhoneNumber' = 2, 'EmailOtpSessionToken' = 3, 'AuthToken' = 4, 'Passkey' = 5, 'AsUser' = 6, 'TwoStepVerification' = 7, 'XboxLive' = 8, 'PlatformLive' = 9]",
+          "enum": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "type": "integer"
+        },
+        "cvalue": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "authenticationProof": {
+          "type": "string"
+        },
+        "IdentityProviderPlatformType": {
+          "format": "int32",
+          "description": " ['Undefined' = 0, 'Xbox' = 1, 'Playstation' = 2, 'Web' = 3]",
+          "enum": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "type": "integer"
+        },
+        "additionalInfoPayload": {
+          "type": "object",
+          "additionalProperties": { }
+        }
+      },
+      "additionalProperties": false
+    },
+    "Roblox.Authentication.Api.Models.Request.ExternalLoginRequest": {
+      "type": "object",
+      "properties": {
+        "identityProvider": {
+          "format": "int32",
+          "enum": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            999
+          ],
+          "type": "integer"
+        },
+        "additionalData": {
+          "type": "object",
+          "additionalProperties": { }
+        },
+        "authenticationProof": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Roblox.Authentication.Api.Models.Request.ExternalSignupRequest": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "birthday": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "locale": {
+          "type": "string"
+        },
+        "authenticationProof": {
+          "type": "string"
+        },
+        "IdentityProviderPlatformType": {
+          "format": "int32",
+          "description": " ['Undefined' = 0, 'Xbox' = 1, 'Playstation' = 2, 'Web' = 3]",
+          "enum": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "type": "integer"
+        },
+        "additionalInfoPayload": {
+          "type": "object",
+          "additionalProperties": { }
+        }
+      },
+      "additionalProperties": false
     },
     "Roblox.Authentication.Api.Models.Request.ExternalUnlinkRequest": {
       "description": "Model for External Unlink requests",
       "type": "object",
       "properties": {
-        "identityProvider": {
+        "IdentityProviderPlatformType": {
           "format": "int32",
-          "description": "External Identity Provider type ['Undefined' = 0, 'Xbox' = 1, 'Playstation' = 2]",
+          "description": " ['Undefined' = 0, 'Xbox' = 1, 'Playstation' = 2, 'Web' = 3]",
           "enum": [
             0,
             1,
-            2
+            2,
+            3
           ],
           "type": "integer"
         },
@@ -3642,7 +4629,35 @@
           "type": "object",
           "additionalProperties": { }
         }
-      }
+      },
+      "additionalProperties": false
+    },
+    "Roblox.Authentication.Api.Models.Request.FinishPasskeyPreauthRegistrationRequest": {
+      "type": "object",
+      "properties": {
+        "sessionId": {
+          "type": "string"
+        },
+        "registrationResponse": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Roblox.Authentication.Api.Models.Request.FinishPasskeyRegistrationRequest": {
+      "type": "object",
+      "properties": {
+        "sessionId": {
+          "type": "string"
+        },
+        "credentialNickname": {
+          "type": "string"
+        },
+        "attestationResponse": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
     },
     "Roblox.Authentication.Api.Models.Request.IdentityVerificationLoginRequest": {
       "description": "Request model for identity verification  login",
@@ -3656,7 +4671,68 @@
           "description": "The IdentityVerificationResultToken",
           "type": "string"
         }
-      }
+      },
+      "additionalProperties": false
+    },
+    "Roblox.Authentication.Api.Models.Request.InitializeLoginRequest": {
+      "required": [
+        "ctype",
+        "cvalue"
+      ],
+      "type": "object",
+      "properties": {
+        "ctype": {
+          "format": "int32",
+          "enum": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "type": "integer"
+        },
+        "cvalue": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "captchaId": {
+          "type": "string"
+        },
+        "captchaToken": {
+          "type": "string"
+        },
+        "captchaProvider": {
+          "type": "string"
+        },
+        "challengeId": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Roblox.Authentication.Api.Models.Request.ListPasskeysRequest": {
+      "type": "object",
+      "properties": {
+        "all": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Roblox.Authentication.Api.Models.Request.LogoutFromAllSessionsAndReauthenticateRequest": {
+      "type": "object",
+      "properties": {
+        "SecureAuthenticationIntent": {
+          "$ref": "#/definitions/Roblox.Authentication.Api.Models.Request.SecureAuthenticationIntentModel"
+        }
+      },
+      "additionalProperties": false
     },
     "Roblox.Authentication.Api.Models.Request.OtpSessionModel": {
       "description": "Model describing secure auth intent.",
@@ -3674,7 +4750,8 @@
           ],
           "type": "integer"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "Roblox.Authentication.Api.Models.Request.SecureAuthenticationIntentModel": {
       "description": "Model describing secure auth intent.",
@@ -3693,7 +4770,171 @@
         "serverNonce": {
           "type": "string"
         }
-      }
+      },
+      "additionalProperties": false
+    },
+    "Roblox.Authentication.Api.Models.Request.StartAuthenticationByUserRequest": {
+      "required": [
+        "ctype",
+        "cvalue"
+      ],
+      "type": "object",
+      "properties": {
+        "ctype": {
+          "format": "int32",
+          "enum": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "type": "integer"
+        },
+        "cvalue": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Roblox.Authentication.Api.Models.Request.StartPasskeyPreauthRegistrationRequest": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Roblox.Authentication.Api.Models.Request.StartPasskeyRegistrationRequest": {
+      "type": "object",
+      "properties": {
+        "isSilentUpgrade": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Roblox.Authentication.Api.Models.Response.ExternalIdentityGateway.ExternalIdentityAccessResponse": {
+      "type": "object",
+      "properties": {
+        "placeId": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "isolationContext": {
+          "type": "string"
+        },
+        "launchData": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Roblox.Authentication.Api.Models.Response.ExternalIdentityGateway.ExternalLoginResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Roblox.Authentication.Api.Models.Response.GetClientAssertionResponse": {
+      "type": "object",
+      "properties": {
+        "clientAssertion": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Roblox.Authentication.Api.Models.Response.InitializeLoginResponse": {
+      "type": "object",
+      "properties": {
+        "loginMethods": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Roblox.Authentication.Api.Models.LoginMethodModel"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "Roblox.Authentication.Api.Models.Response.ListPasskeyCredentialResponse": {
+      "type": "object",
+      "properties": {
+        "credentials": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Roblox.Authentication.Api.Models.Response.PasskeyCredential"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "Roblox.Authentication.Api.Models.Response.PasskeyCredential": {
+      "type": "object",
+      "properties": {
+        "nickname": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Roblox.Authentication.Api.Models.Response.StartAuthenticationByUserResponse": {
+      "type": "object",
+      "properties": {
+        "authenticationOptions": {
+          "type": "string"
+        },
+        "sessionId": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Roblox.Authentication.Api.Models.Response.StartAuthenticationResponse": {
+      "type": "object",
+      "properties": {
+        "authenticationOptions": {
+          "type": "string"
+        },
+        "sessionId": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Roblox.Authentication.Api.Models.Response.StartPasskeyPreauthRegistrationResponse": {
+      "type": "object",
+      "properties": {
+        "creationOptions": {
+          "type": "string"
+        },
+        "sessionId": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Roblox.Authentication.Api.Models.Response.StartPasskeyRegistrationResponse": {
+      "type": "object",
+      "properties": {
+        "creationOptions": {
+          "type": "string"
+        },
+        "sessionId": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
     },
     "Roblox.Authentication.Api.Models.RevertAccountInfoResponse": {
       "description": "Represents the response when requesting revert account metadata",
@@ -3728,7 +4969,8 @@
           "description": "Ticket Guid",
           "type": "string"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "Roblox.Authentication.Api.Models.RevertAccountSubmitRequest": {
       "description": "Request Model to submit a revert account request",
@@ -3759,7 +5001,8 @@
           "description": "The 2SV verification token (when redeeming a solved 2SV challenge).",
           "type": "string"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "Roblox.Authentication.Api.Models.RobloxAccountCreateRequest": {
       "description": "Request model for the Roblox Account Create endpoint",
@@ -3847,7 +5090,7 @@
         },
         "gender": {
           "format": "int32",
-          "description": "Gender ['Unknown' = 1, 'Male' = 2, 'Female' = 3]",
+          "description": " ['Unknown' = 1, 'Male' = 2, 'Female' = 3]",
           "enum": [
             1,
             2,
@@ -3858,6 +5101,9 @@
         "birthday": {
           "format": "date-time",
           "description": "Birthday",
+          "type": "string"
+        },
+        "displayName": {
           "type": "string"
         },
         "isTosAgreementBoxChecked": {
@@ -3938,6 +5184,15 @@
           "description": "Metadata associated with the current session.",
           "type": "string"
         },
+        "passkeySessionId": {
+          "type": "string"
+        },
+        "passkeyRegistrationResponse": {
+          "type": "string"
+        },
+        "accountLinkParameters": {
+          "$ref": "#/definitions/Roblox.Authentication.Api.Models.AccountLinkParameters"
+        },
         "captchaId": {
           "type": "string"
         },
@@ -3950,7 +5205,8 @@
         "challengeId": {
           "type": "string"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "Roblox.Authentication.Api.Models.SignupResponse": {
       "description": "A response model for the Signup endpoint",
@@ -3974,7 +5230,8 @@
           "description": "Metadata associated with the current session.",
           "type": "string"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "Roblox.Authentication.Api.Models.SocialAuthenticationDisconnectRequest": {
       "type": "object",
@@ -3983,7 +5240,8 @@
           "description": "The password of the account attempting to disconnect a social authentication provider.\r\nThis parameter is only required when disconnecting WeChat or QQ.",
           "type": "string"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "Roblox.Authentication.Api.Models.SocialProvidersResponse": {
       "description": "A model containing detailed information about the social user",
@@ -3996,7 +5254,8 @@
             "$ref": "#/definitions/Roblox.Authentication.Api.Models.ProviderInfoModel"
           }
         }
-      }
+      },
+      "additionalProperties": false
     },
     "Roblox.Authentication.Api.Models.TencentAuthResponse": {
       "description": "Response Model for the Token Exchange Endpoint",
@@ -4206,13 +5465,16 @@
       "properties": {
         "mediaType": {
           "format": "int32",
-          "description": "The media type the two step verification code was sent on ['Email' = 0, 'SMS' = 1, 'Authenticator' = 2, 'RecoveryCode' = 3, 'SecurityKey' = 4]",
+          "description": " ['Email' = 0, 'SMS' = 1, 'Authenticator' = 2, 'RecoveryCode' = 3, 'SecurityKey' = 4, 'CrossDevice' = 5, 'Password' = 6, 'Passkey' = 7]",
           "enum": [
             0,
             1,
             2,
             3,
-            4
+            4,
+            5,
+            6,
+            7
           ],
           "type": "integer"
         },
@@ -4220,7 +5482,8 @@
           "description": "The two step verification ticket",
           "type": "string"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "Roblox.Authentication.Api.Models.TwoStepVerificationTicketRequest": {
       "description": "A request model that holds two step verification ticket information",
@@ -4302,7 +5565,8 @@
           "description": "The password",
           "type": "string"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "Roblox.Authentication.Api.Models.UsernameValidationRequest": {
       "type": "object",
@@ -4326,7 +5590,8 @@
           ],
           "type": "integer"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "Roblox.Authentication.Api.Models.UsernameValidationResponse": {
       "description": "A result representing the information about if username is valid or not.",
@@ -4334,7 +5599,7 @@
       "properties": {
         "code": {
           "format": "int32",
-          "description": "The Roblox.Authentication.Api.Models.UsernameValidationStatus of the username validation. ['ValidUsername' = 0, 'AlreadyInUseError' = 1, 'ModerationError' = 2, 'InvalidLengthError' = 3, 'StartsOrEndsWithUnderscoreError' = 4, 'TooManyUnderscoresError' = 5, 'ContainsSpacesError' = 6, 'InvalidCharactersError' = 7, 'ContainsPiiError' = 10, 'ContainsReservedUsernameError' = 12]",
+          "description": " ['ValidUsername' = 0, 'AlreadyInUseError' = 1, 'ModerationError' = 2, 'InvalidLengthError' = 3, 'StartsOrEndsWithUnderscoreError' = 4, 'TooManyUnderscoresError' = 5, 'ContainsSpacesError' = 6, 'InvalidCharactersError' = 7, 'ContainsPiiError' = 10, 'ContainsReservedUsernameError' = 12]",
           "enum": [
             0,
             1,
@@ -4353,7 +5618,8 @@
           "description": "The response message of the username validation.",
           "type": "string"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "Roblox.Authentication.Api.Models.UsernamesResponse": {
       "description": "The response model to get existing usernames on Roblox",
@@ -4366,7 +5632,8 @@
             "type": "string"
           }
         }
-      }
+      },
+      "additionalProperties": false
     },
     "Roblox.Authentication.Api.Models.XboxCollectionsOfUserResponse": {
       "description": "The information representing a collection of users",
@@ -4379,7 +5646,8 @@
             "$ref": "#/definitions/Roblox.Authentication.Api.Models.XboxUserModel"
           }
         }
-      }
+      },
+      "additionalProperties": false
     },
     "Roblox.Authentication.Api.Models.XboxConnectionModel": {
       "description": "A model containing information on whether the user is a Xbox user.",
@@ -4388,8 +5656,12 @@
         "hasConnectedXboxAccount": {
           "description": "Whether the current user has Xbox account connected.",
           "type": "boolean"
+        },
+        "gamertag": {
+          "type": "string"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "Roblox.Authentication.Api.Models.XboxLiveAccountResponse": {
       "description": "A response model for returing xboxlive account info",
@@ -4515,7 +5787,8 @@
           "description": "The count of Xbox log in consecutive days",
           "type": "integer"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "Roblox.Authentication.Api.Models.XboxTranslateRequest": {
       "description": "Model for Xbox translate requests",
@@ -4528,7 +5801,8 @@
             "type": "string"
           }
         }
-      }
+      },
+      "additionalProperties": false
     },
     "Roblox.Authentication.Api.Models.XboxUserModel": {
       "description": "A model containing information about Xbox User.",
@@ -4544,7 +5818,8 @@
         "Username": {
           "type": "string"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "Roblox.Web.Responses.Users.SkinnyUserResponse": {
       "type": "object",
@@ -4559,10 +5834,12 @@
         "displayName": {
           "type": "string"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "Roblox.Web.WebAPI.ApiEmptyResponseModel": {
-      "type": "object"
+      "type": "object",
+      "additionalProperties": false
     },
     "Roblox.Web.WebAPI.Models.ApiSuccessResponse": {
       "type": "object",
@@ -4570,7 +5847,8 @@
         "success": {
           "type": "boolean"
         }
-      }
+      },
+      "additionalProperties": false
     }
   }
 }
