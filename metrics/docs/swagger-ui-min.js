@@ -10506,7 +10506,7 @@
                     if (this.isBuilt)
                         return this;
                     var t = this;
-                             
+               
                     this.spec ? this.progress("fetching resource list; Please wait.") : this.progress("fetching resource list: " + this.url + "; Please wait.");
                     var n = {
                         useJQuery: this.useJQuery,
