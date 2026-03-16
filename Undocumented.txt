@@ -12,4 +12,5 @@ https://www.roblox.com/ide/publish/uploadnewanimation?assetTypeName=Animation
 &description=Description
 &AllID=1
 &ispublic=False
-&isGamesAsset=False"
+&isGamesAsset=False
+&groupId=1 < Only set if you can upload animations on a group
