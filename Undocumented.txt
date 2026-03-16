@@ -1,4 +1,12 @@
 https://develop.roblox.com/v1/assets/<id>/published-versions?limit=10
 
 https://apis.roblox.com/game-update-notifications/v1/filter
-Send a POST request with the specified text in the body that will be filtered
+Send a POST request with the specified text wrapped in quotation marks as JSON in the body that will be filtered
+
+https://data.roblox.com/ide/publish/UploadNewMesh
+?name=Mesh
+&description=Description
+
+https://www.roblox.com/ide/publish/uploadnewanimation
+?assetTypeName=Animation
+
