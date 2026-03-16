@@ -1,6 +1,6 @@
 # Documentation
   Official ROBLOX Web API documentation. Except it isn't an insecure person and isn't hiding anything. ← Ironic now that the original repository is private\
-  Note from the person maintaining this fork: I kind of need some help documenting almost everything as I'm way too dumber in all honesty than the original repo owner\
+  **Note from the person maintaining this fork: I kind of need some help documenting almost everything as I'm way too dumber in all honesty than the original repo owner**\
   Note: This was not posted by an official Roblox engineer. Also note that this is not *completely* done yet as I have other things to do at the moment, more updates will come though
 # What's different?
   Internal APIs (previously undocumented to the public)\
