@@ -1,5 +1,6 @@
 # Documentation
-  Official ROBLOX Web API documentation. Except it isn't an insecure person and isn't hiding anything.\
+  Official ROBLOX Web API documentation. Except it isn't an insecure person and isn't hiding anything. ← Ironic now that the original repository is private\
+  Note from the person maintaining this fork: I kind of need some help documenting almost everything as I'm way too dumber in all honesty than the original repo owner\
   Note: This was not posted by an official Roblox engineer. Also note that this is not *completely* done yet as I have other things to do at the moment, more updates will come though
 # What's different?
   Internal APIs (previously undocumented to the public)\
@@ -21,4 +22,5 @@
 # Credits
   h0nda (extracted them somewhere around late 2020 or early 2021, he saved the internal docs before it got closed and then proceeded to leak it, thanks G)\
   EasternBloxxer (grabbed a portion of the internal documents during july 2023, but only 26 internal versions out of 67 available documentation versions were actually obtained)\
-  idkwhatnametoget helped me (eastern) with above and probably was the one to find out about ashburn and the internal docs being public on there (I cant remember ):)
+  idkwhatnametoget helped the original repo owner with above and probably was the one to find out about ashburn and the internal docs being public on there
+  random ass people i don't know for some of the web apis i'm too lazy to search deeply for
