@@ -7,6 +7,9 @@ https://data.roblox.com/ide/publish/UploadNewMesh
 ?name=Mesh
 &description=Description
 
-https://www.roblox.com/ide/publish/uploadnewanimation
-?assetTypeName=Animation
-
+https://www.roblox.com/ide/publish/uploadnewanimation?assetTypeName=Animation
+&name=Animation
+&description=Description
+&AllID=1
+&ispublic=False
+&isGamesAsset=False"
