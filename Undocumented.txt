@@ -15,3 +15,10 @@ https://www.roblox.com/ide/publish/uploadnewanimation?assetTypeName=Animation
 &ispublic=False
 &isGamesAsset=False
 &groupId=1 < Only set if you can upload animations on a group
+
+https://www.roblox.com/ide/publish/UploadNewSound?assetTypeName=Sound
+&name=Sound
+&description=Description
+
+https://data.roblox.com/data/upload/json
+?assetTypeId=13
